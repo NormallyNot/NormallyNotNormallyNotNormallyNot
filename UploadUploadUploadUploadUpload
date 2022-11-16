@@ -37,12 +37,41 @@ local RenderStepped = RunService.RenderStepped
 local RenderSteppedWait = RenderStepped.Wait
 local GetMouseLocation = UserInputService.GetMouseLocation
 
+-- Distance Fov Changer Modded By JustAimlock Do Not Steal Skids
+local function GetRelativeDistanceFromMouse(Target, Mouse, MaxFov)
+    local Camera = workspace.CurrentCamera
+    local Position, OnScreen = Camera:WorldToScreenPoint(Target)
+    local MouseX, MouseY = Mouse.X, Mouse.Y
+    local MouseDistance = (((MouseX ^ 2) - (Position.X ^ 2)) + ((MouseY ^ 2) - (Position.Y ^ 2))) ^ 0.5
+    local RelativeDistance = OnScreen
+    if OnScreen and (not MaxFov or (MouseDistance <= MaxFov)) then
+        local RelativePosition = Camera:ScreenPointToRay(MouseX, MouseY, Position.Z).Origin
+        RelativeDistance = (Target - RelativePosition).Magnitude 
+    end
+    return MouseDistance, RelativeDistance
+end
+
+Aiming.FOV = 12
+Aiming.DistanceFOV = 6 -- 10 studs or below
+
+for _, Player in next, Players:GetPlayers(), 1 do
+    local Character = Player.Character
+    local Torso = Character and Character:FindFirstChild("Torso")
+    if Torso then
+        local MouseDistance, RelativeDistance = GetRelativeDistanceFromMouse(Torso.Position, Mouse, FOV)
+        if RelativeDistance and (RelativeDistance <= DistanceFOV) then
+            -- Target is valid
+        end
+    end
+end
+
 -- // Silent Aim Vars
 local Aiming = {
     Enabled = true,
 
     ShowFOV = true,
     FOV = 12,
+    DistanceFOV = 6,
     FOVSides = 12,
     FOVColour = Color3fromRGB(231, 84, 128),
 
